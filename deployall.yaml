@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-front1
+spec:
+  replicas: 8
+  selector:
+    matchLabels:
+      app: web-front1
+  template:
+    metadata:
+      name: web-front1
+      labels:
+        app: web-front1
+    spec:
+      containers:
+        - name: web-front1
+          image: tacobayle/busybox-v1
+          command: [ "sh", "-c"]
+          args:
+          - while true; do
+              echo -e "HTTP/1.1 200 OK\n\n$(date)\nApp version is $(printenv AppVersion)\nNode is on nordiclab $(printenv MY_NODE_NAME)\nPod is $(printenv MY_POD_NAME)\nNamespace is $(printenv MY_POD_NAMESPACE)\nPod IP is $(printenv MY_POD_IP)\nPod Service account is $(printenv MY_POD_SERVICE_ACCOUNT)" | nc -l -p 8080;
+            done;
+          env:
+            - name: MY_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: MY_POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: MY_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: MY_POD_SERVICE_ACCOUNT
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.serviceAccountName
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-front-1
+spec:
+  selector:
+    app: web-front1
+  ports:
+    - name: custom 
+      protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: ClusterIP
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress
+spec:
+  ingressClassName: avi-lb
+  rules:
+    - host: ingress-chrisblog.k8s.sfo.rainpole.io #Provide Your Hostname here
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: web-front-1
+                port:
+                  number: 80
+
+  tls:
+  - hosts:
+    - ingress-chrisblog.k8s.sfo.rainpole.io 
+    secretName: wildcard-cert
+
+---
+apiVersion: ako.vmware.com/v1beta1
+kind: HTTPRule
+metadata:
+   name: my-http-rule
+   namespace: demo
+spec:
+  fqdn: ingress-chrisblog.k8s.sfo.rainpole.io
+  paths:
+  - target: /v1
+    loadBalancerPolicy:
+      algorithm: LB_ALGORITHM_ROUND_ROBIN 
+
+---
+apiVersion: ako.vmware.com/v1beta1
+kind: HostRule
+metadata:
+  name: waf-rule
+spec:
+  virtualhost:
+    fqdn: ingress-chrisblog.k8s.sfo.rainpole.io # mandatory
+    fqdnType: Exact
+    useRegex: false 
+    enableVirtualHost: true
+    wafPolicy: System-WAF-Policy
