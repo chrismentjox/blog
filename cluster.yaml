@@ -2,7 +2,7 @@ apiVersion: cluster.x-k8s.io/v1beta1
 kind: Cluster
 metadata:
   name: chrisblog-cluster01
-  namespace: chrisblog 
+  namespace: chrisblog-yhzxq 
 spec:
   clusterNetwork:
     pods:

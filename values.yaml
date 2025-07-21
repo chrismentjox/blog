@@ -63,7 +63,7 @@ NetworkSettings:
   #     cidrs:
   #       - 192.168.31.0/24
   enableRHI: false # This is a cluster wide setting for BGP peering.
-  nsxtT1LR: '/orgs/default/projects/chrisblog/vpcs/chrisblog-vpc' # T1 Logical Segment mapping for backend network. Only applies to NSX-T cloud.
+  nsxtT1LR: '/orgs/default/projects/a9f773a7-f822-4f88-b7b0-bcd409fe28d5/vpcs/vpc-f5oa' # T1 Logical Segment mapping for backend network. Only applies to NSX-T cloud.
   bgpPeerLabels: [] # Select BGP peers using bgpPeerLabels, for selective VsVip advertisement.
   # bgpPeerLabels:
   #   - peer1
@@ -95,7 +95,7 @@ ControllerSettings:
   controllerVersion: '31.1.1' # The controller API version
   cloudName: sfo-w01-nsx01   # The configured cloud name on the Avi controller.
   controllerHost: '10.11.10.151' # IP address or Hostname of Avi Controller
-  tenantName: chrisblog # Name of the tenant where all the AKO objects will be created in AVI.
+  tenantName: a9f773a7-f822-4f88-b7b0-bcd409fe28d5 # Name of the tenant where all the AKO objects will be created in AVI.
   vrfName: "" # Name of the VRFContext. All Avi objects will be under this VRF. Applicable only in Vcenter Cloud.
 
 nodePortSelector: # Only applicable if serviceType is NodePort
