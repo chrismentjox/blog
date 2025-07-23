@@ -1,0 +1,13 @@
+apiVersion: vmoperator.vmware.com/v1alpha4
+kind: VirtualMachineService
+metadata:
+  name: argocd-demo-svc
+spec:
+  selector:
+    vm-selector: test-vm 
+  type: LoadBalancer 
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80

@@ -2,6 +2,6 @@ apiVersion: argocd-service.vsphere.vmware.com/v1alpha1
 kind: ArgoCD
 metadata:
   name: argocd-1
-  namespace: chrisblog
+  namespace: chrisblog-yhzxq 
 spec:
   version: 2.14.13+vmware.1-vks.1
