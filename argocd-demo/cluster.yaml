@@ -1,0 +1,74 @@
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  name: argocd-cluster01
+spec:
+  clusterNetwork:
+    pods:
+      cidrBlocks:
+        - 192.168.156.0/20
+    services:
+      cidrBlocks:
+        - 10.96.0.0/12
+    serviceDomain: cluster.local
+  topology:
+    class: builtin-generic-v3.4.0
+    version: v1.33.1---vmware.1-fips-vkr.2
+    variables:
+      - name: vsphereOptions
+        value:
+          persistentVolumes:
+            availableStorageClasses:
+              - vsan-default-storage-policy
+            defaultStorageClass: vsan-default-storage-policy
+      - name: kubernetes
+        value:
+          certificateRotation:
+            enabled: true
+            renewalDaysBeforeExpiry: 90
+      - name: vmClass
+        value: best-effort-small
+      - name: storageClass
+        value: vsan-default-storage-policy
+      - name: osConfiguration
+        value:
+          trust:
+            additionalTrustedCAs:
+              - caCert:
+            # Plain text CA cert can be added using the `content` key
+                  content: |-
+                    -----BEGIN CERTIFICATE-----
+                    MIIDdTCCAl2gAwIBAgIQXkq4sP/FtJlHLLSVIVuXWzANBgkqhkiG9w0BAQsFADBN
+                    MRIwEAYKCZImiZPyLGQBGRYCaW8xGDAWBgoJkiaJk/IsZAEZFghyYWlucG9sZTEd
+                    MBsGA1UEAxMUcmFpbnBvbGUtUlBMLUFEMDEtQ0EwHhcNMjUwNDA2MTU1OTU4WhcN
+                    MzAwNDA2MTYwOTU4WjBNMRIwEAYKCZImiZPyLGQBGRYCaW8xGDAWBgoJkiaJk/Is
+                    ZAEZFghyYWlucG9sZTEdMBsGA1UEAxMUcmFpbnBvbGUtUlBMLUFEMDEtQ0EwggEi
+                    MA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC4v3upcDvJtNlNw9XiD0rDg/bt
+                    XIyMCDISHSNeSAPR1Y3pQW1ekT7ZX82aRtwH5tKFyFL2KL8YHNgk+UXmFY170L0b
+                    5mq4t2sbx1NUY9CflKiSdcJEWTWjVxvkBvSUPIfDJnvZ5VjpPkOvo030yy9zyJXB
+                    zUj1Sl2uPJ8t+Ggg65cJ6g79DQyZkBe1gKj/5yrqDt1ycUP3Ky0GDODGOFFUoTkB
+                    Mqw8T7cpOOYG1DXlwoCUw4kV5o2KolPtJFk2SlJ5uh2P83XP7dVwbLxQhrxMOkpQ
+                    r4br/j6hKvelwtiBfmdFX/3+txUJensv5b8lUrKWA/BvIsPkjFRniyR7S/0xAgMB
+                    AAGjUTBPMAsGA1UdDwQEAwIBhjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBRT
+                    E3ThTFPkMJmTAwg6c3ncW9DqKzAQBgkrBgEEAYI3FQEEAwIBADANBgkqhkiG9w0B
+                    AQsFAAOCAQEAbZgYU/TEyNZdu2JuTa7lUuy8FaYIibRLPIeb38mGtu1Y+8IbkMf5
+                    R9gr0621Z2CWLqsQpzI9V4EFFM5SGkyeZoDLFNu7yXY72i/CQcyAlLV+PDGdF5VP
+                    LdlpNiF1gJfjjtzNXe0sQxVovwJe0h0sVGo3bLyBRHjwdZrbJinXMzJ8v+r2apnL
+                    zGt/1YKJL2MFJrS6Dttpw7OJ6dZNUZpUlfVAJEnNqm67pJjEmWFiEoS5jY5wueSI
+                    rZ2Jp5IcYryzeWuQpDNISEXZtKrvAVVET/6XAIRwqcZcNQHJzlCd7HHtOLpOoVwS
+                    pGHSVdBB1GdEYDJ/mesIyEQcPlDeJeKatg==
+                    -----END CERTIFICATE-----
+    controlPlane:
+      replicas: 1
+      metadata:
+        annotations:
+          run.tanzu.vmware.com/resolve-os-image: os-name=photon, content-library=cl-ba847d465f368bb3d
+    workers:
+      machineDeployments:
+        - class: node-pool
+          name: kubernetes-cluster-vgy2-nodepool-ppjx
+          replicas: 2
+          metadata:
+            annotations:
+              run.tanzu.vmware.com/resolve-os-image: os-name=photon, content-library=cl-ba847d465f368bb3d
+
