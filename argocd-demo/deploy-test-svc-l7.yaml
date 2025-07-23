@@ -18,7 +18,6 @@ kind: Ingress
 metadata:
   name: chris-ingress
 spec:
-  ingressClassName: avi-lb
   tls:
   - hosts:
       - ingress6.k8s.sfo.rainpole.io
