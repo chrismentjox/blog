@@ -1,0 +1,24 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: chris-tkg-gateway 
+  namespace: demo 
+spec:
+  gatewayClassName: avi-lb
+  listeners:
+  - name: foo-http
+    protocol: HTTP
+    port: 80 
+    hostname: "*.k8s.sfo.rainpole.io"
+  - name: foo-https
+    protocol: HTTPS
+    port: 443
+    hostname: "*.k8s.sfo.rainpole.io"
+    tls:
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: wildcard-cert
+      #  addresses:
+      #  - type: IPAddress
+      #    value: 192.168.202.99

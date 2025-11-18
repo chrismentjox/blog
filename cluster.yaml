@@ -1,8 +1,8 @@
-apiVersion: cluster.x-k8s.io/v1beta1
+apiVersion: cluster.x-k8s.io/v1beta2
 kind: Cluster
 metadata:
   name: chrisblog-cluster01
-  namespace: chrisblog-yhzxq 
+  namespace: chrisblog-8myhv 
 spec:
   clusterNetwork:
     pods:
@@ -13,8 +13,8 @@ spec:
         - 10.96.0.0/12
     serviceDomain: cluster.local
   topology:
-    class: builtin-generic-v3.4.0
-    version: v1.33.1---vmware.1-fips-vkr.2
+    class: builtin-generic-v3.5.0
+    version: v1.34.1+vmware.1-vkr.4 
     variables:
       - name: vsphereOptions
         value:
@@ -28,7 +28,7 @@ spec:
             enabled: true
             renewalDaysBeforeExpiry: 90
       - name: vmClass
-        value: best-effort-small
+        value: best-effort-large
       - name: storageClass
         value: vsan-default-storage-policy
       - name: osConfiguration
@@ -63,7 +63,7 @@ spec:
       replicas: 1
       metadata:
         annotations:
-          run.tanzu.vmware.com/resolve-os-image: os-name=photon, content-library=cl-ba847d465f368bb3d
+          run.tanzu.vmware.com/resolve-os-image: os-name=photon, content-library=cl-e66d9d6b8b9a6df64
     workers:
       machineDeployments:
         - class: node-pool
@@ -71,5 +71,5 @@ spec:
           replicas: 2
           metadata:
             annotations:
-              run.tanzu.vmware.com/resolve-os-image: os-name=photon, content-library=cl-ba847d465f368bb3d
+              run.tanzu.vmware.com/resolve-os-image: os-name=photon, content-library=cl-e66d9d6b8b9a6df64
 

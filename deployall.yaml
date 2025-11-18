@@ -53,7 +53,7 @@ spec:
   selector:
     app: web-front1
   ports:
-    - name: custom 
+    - name: http
       protocol: TCP
       port: 80
       targetPort: 8080
@@ -92,7 +92,7 @@ metadata:
 spec:
   fqdn: ingress-chrisblog.k8s.sfo.rainpole.io
   paths:
-  - target: /v1
+  - target: /
     loadBalancerPolicy:
       algorithm: LB_ALGORITHM_ROUND_ROBIN 
 

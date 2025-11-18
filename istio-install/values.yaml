@@ -92,7 +92,7 @@ L4Settings:
 ### This section outlines settings on the Avi controller that affects AKO's functionality.
 ControllerSettings:
   serviceEngineGroupName: Default-Group   # Name of the ServiceEngine Group.
-  controllerVersion: '31.1.2' # The controller API version
+  controllerVersion: '31.2.1' # The controller API version
   cloudName: sfo-w01-nsx01   # The configured cloud name on the Avi controller.
   controllerHost: '10.11.10.151' # IP address or Hostname of Avi Controller
   tenantName: b3cf7140-ee60-4c57-afb5-e8941db4d252 # Name of the tenant where all the AKO objects will be created in AVI.

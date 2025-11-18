@@ -1,0 +1,116 @@
+apiVersion: vmoperator.vmware.com/v1alpha3
+kind: VirtualMachine
+metadata:
+  name: vm-web01
+  namespace: chrisblog-8myhv
+  labels:
+    vm-selector: vm-web01
+    vm-lb-hhln: vm-lb-selector
+spec:
+  className: best-effort-small
+  # Friendly image name: ubuntu-24.04-server-cloudimg-amd64
+  imageName: vmi-bd3cc5f4167ba473f
+  storageClass: vsan-default-storage-policy
+  powerState: PoweredOn
+  network:
+    nameservers:
+      - 10.11.10.4
+    searchDomains:
+      - rainpole.io
+    interfaces:
+      - name: eth0
+        network:
+          name: external-subnet
+          kind: Subnet
+  bootstrap:
+    cloudInit:
+      cloudConfig:
+        defaultUserEnabled: true
+        users:
+          - name: chris
+            passwd:
+              name: vm-vqvd-bootstrap-secret
+              key: chris-passwd
+            lock_passwd: false
+            sudo: ALL=(ALL) NOPASSWD:ALL
+        runcmd:
+            - /usr/bin/apt update
+            - /usr/bin/apt-get install -y apache2 php php-mysql libapache2-mod-php php-cli php-common php-intl php-gd php-mbstring php-xml php-zip php-curl php-xmlrpc unzip open-vm-tools
+      sshAuthorizedKeys:
+        - >-
+          ssh-ed25519
+          AAAAC3NzaC1lZDI1NTE5AAAAILSao9N/uXtHc3JFrXtxpyUfda4KugWk/2YEl/pJJl2A
+          root@sfo-jumphost01
+
+
+---
+apiVersion: vmoperator.vmware.com/v1alpha3
+kind: VirtualMachine
+metadata:
+  name: vm-web02
+  namespace: chrisblog-8myhv
+  labels:
+    vm-selector: vm-web02
+    vm-lb-hhln: vm-lb-selector
+spec:
+  className: best-effort-small
+  # Friendly image name: ubuntu-24.04-server-cloudimg-amd64
+  imageName: vmi-bd3cc5f4167ba473f
+  storageClass: vsan-default-storage-policy
+  powerState: PoweredOn
+  network:
+    nameservers:
+      - 10.11.10.4
+    searchDomains:
+      - rainpole.io
+    interfaces:
+      - name: eth0
+        network:
+          name: external-subnet
+          kind: Subnet
+  bootstrap:
+    cloudInit:
+      cloudConfig:
+        defaultUserEnabled: true
+        users:
+          - name: chris
+            passwd:
+              name: vm-vqvd-bootstrap-secret
+              key: chris-passwd
+            lock_passwd: false
+            sudo: ALL=(ALL) NOPASSWD:ALL
+        runcmd:
+            - /usr/bin/apt update
+            - /usr/bin/apt-get install -y apache2 php php-mysql libapache2-mod-php php-cli php-common php-intl php-gd php-mbstring php-xml php-zip php-curl php-xmlrpc unzip open-vm-tools
+      sshAuthorizedKeys:
+        - >-
+          ssh-ed25519
+          AAAAC3NzaC1lZDI1NTE5AAAAILSao9N/uXtHc3JFrXtxpyUfda4KugWk/2YEl/pJJl2A
+          root@sfo-jumphost01
+---
+apiVersion: vmoperator.vmware.com/v1alpha3
+kind: VirtualMachineService
+metadata:
+  name: vm-lb-hhln
+  namespace: chrisblog-8myhv
+spec:
+  selector:
+    vm-lb-hhln: vm-lb-selector
+  type: LoadBalancer
+  ports:
+    - name: port80
+      protocol: TCP
+      port: 80
+      targetPort: 80
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: vm-vqvd-bootstrap-secret
+  namespace: chrisblog-8myhv
+  labels:
+    vm-selector: vm-vqvd
+stringData:
+  chris-passwd: |-
+    $1$gDTPq.Ym$DuhFVD0NKvuwWDlCWO9.v/

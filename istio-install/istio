@@ -1,0 +1,55 @@
+WARNING: Ako 2.1.1 and 31.1 needed. 31.2 does not work due to strict SAN
+WEBSITE: for the packeges https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vsphere-supervisor-services-and-standalone-components/latest/release-notes/vks-standard-packages-release-notes.html#GUID-2c294e53-b2eb-40ec-be77-5028c9a8e658-en_id-d1d3ab67-e698-4174-9fb5-2fe7c8c4cfb3
+
+Get the istio CLI
+mkdir ~/istiodir; cd ~/istiodir
+# Download the Isito package & samples
+curl -L https://istio.io/downloadIstio | sh -
+# Optionally copy out the Istioctl binary
+sudo cp istio*/bin/istioctl /usr/local/bin
+
+vcf context create --endpoint 10.10.20.3 --username administrator@sfo-w01.local --workload-cluster-name chrisblog-cluster01 --workload-cluster-namespace chrisblog-8myhv
+
+kubectl create ns packages
+vcf package repository add vks-repo --url projects.packages.broadcom.com/vsphere/supervisor/packages/2025.6.17/vks-standard-packages:v2025.6.17 -n packages
+
+NEWER
+vcf package repository add vks-repo --url projects.packages.broadcom.com/vsphere/supervisor/packages/2025.10.22/vks-standard-packages:3.5.0-20251022 -n packages
+vcf package available get ako.kubernetes.vmware.com -n packages
+
+
+vcf package available get istio.kubernetes.vmware.com/1.25.3+vmware.1-vks.1 \
+--default-values-file-output istio-data-values.yaml -n packages
+
+ vcf package install istio -p istio.kubernetes.vmware.com --version 1.27.1+vmware.1-vks.1 --values-file istio-data-values.yaml -n packages
+
+kubectl get pods -n istio-system -o custom-columns="NAME:.metadata.name,NODE:.spec.nodeName"
+
+
+Enable the sidecar.
+kubectl label namespace avi-system istio-injection=enabled
+kubectl label namespace demo istio-injection=enabled
+
+
+
+UPDATE config
+Had to set strictmtls to true. in the yaml
+To apply the config
+vcf package installed update istio -p istio.kubernetes.vmware.com --version 1.25.3+vmware.1-vks.1 --values-file istio-data-values.yaml -n packages
+vcf package installed update istio -p istio.kubernetes.vmware.com --version 1.27.1+vmware.1-vks.1 --values-file istio-data-values.yaml -n packages
+
+
+BUGGIE:
+
+add to the statefulset
+
+kubectl get statefulset -n avi-system
+kubectl edit statefulset ako -n avi-system
+
+ serviceAccountName: ako-sa
+      terminationGracePeriodSeconds: 30
+
+	volumes:
+  	  - emptyDir:
+              medium: Memory
+            name: istio-certs

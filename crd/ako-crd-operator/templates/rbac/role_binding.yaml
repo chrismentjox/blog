@@ -1,0 +1,20 @@
+---
+# Source: ako-crd-operator/templates/rbac/role_binding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/version: "2.1.1"
+    helm.sh/chart: "2.1.1"
+    app.kubernetes.io/name: ako-crd-operator
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+  name: ako-crd-operator-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ako-crd-operator-role
+subjects:
+- kind: ServiceAccount
+  name: ako-crd-operator
+  namespace: default

@@ -11,13 +11,14 @@ featureGates:
 replicaCount: 1
 
 image:
-  repository:  projects.packages.broadcom.com/ako/ako
-  pullPolicy: IfNotPresent
+  repository: projects.packages.broadcom.com/ako/ako 
+  pullPolicy: Always
 
 GatewayAPI:
   image:
-    repository:  projects.packages.broadcom.com/ako/ako-gateway-api
-    pullPolicy: IfNotPresent
+    repository: projects.packages.broadcom.com/ako/ako-gateway-api
+    #repository: harbor.sfo.rainpole.io:443/ako/ako-gateway-api
+    pullPolicy: Always
 
 ### This section outlines the generic AKO settings
 AKOSettings:
@@ -28,8 +29,8 @@ AKOSettings:
   apiServerPort: 8080 # Internal port for AKO's API server for the liveness probe of the AKO pod default=8080
   deleteConfig: 'false' # Has to be set to true in configmap if user wants to delete AKO created objects from AVI 
   disableStaticRouteSync: 'false' # If the POD networks are reachable from the Avi SE, set this knob to true.
-  clusterName: chrisblog   # A unique identifier for the kubernetes cluster, that helps distinguish the objects for this cluster in the avi controller. // MUST-EDIT
-  cniPlugin: 'antrea' # Set the string if your CNI is calico or openshift. enum: calico|canal|flannel|openshift|antrea|ncp
+  clusterName: osp   # A unique identifier for the kubernetes cluster, that helps distinguish the objects for this cluster in the avi controller. // MUST-EDIT
+  cniPlugin: 'ovn-kubernetes' # Set the string if your CNI is calico or openshift. enum: calico|canal|flannel|openshift|antrea|ncp
   enableEVH: true # This enables the Enhanced Virtual Hosting Model in Avi Controller for the Virtual Services
   layer7Only: false # If this flag is switched on, then AKO will only do layer 7 loadbalancing.
   # NamespaceSelector contains label key and value used for namespacemigration
@@ -40,7 +41,7 @@ AKOSettings:
   servicesAPI: false # Flag that enables AKO in services API mode: https://kubernetes-sigs.github.io/service-apis/. Currently implemented only for L4. This flag uses the upstream GA APIs which are not backward compatible 
                      # with the advancedL4 APIs which uses a fork and a version of v1alpha1pre1 
   vipPerNamespace: 'false' # Enabling this flag would tell AKO to create Parent VS per Namespace in EVH mode
-  istioEnabled: true 
+  istioEnabled: true # This flag needs to be enabled when AKO is be to brought up in an Istio environment
   # This is the list of system namespaces from which AKO will not listen any Kubernetes or Openshift object event.
   blockedNamespaceList: []
   #blockedNamespaceList:
@@ -63,7 +64,8 @@ NetworkSettings:
   #     cidrs:
   #       - 192.168.31.0/24
   enableRHI: false # This is a cluster wide setting for BGP peering.
-  nsxtT1LR: '/orgs/default/projects/b3cf7140-ee60-4c57-afb5-e8941db4d252/vpcs/vpc-sfum' # T1 Logical Segment mapping for backend network. Only applies to NSX-T cloud.
+  nsxtT1LR: '/orgs/default/projects/b3cf7140-ee60-4c57-afb5-e8941db4d252/vpcs/openshift' # T1 Logical Segment mapping for backend network. Only applies to NSX-T cloud.
+    #nsxtT1LR: '/orgs/default/projects/admin/vpcs/openshift'
   bgpPeerLabels: [] # Select BGP peers using bgpPeerLabels, for selective VsVip advertisement.
   # bgpPeerLabels:
   #   - peer1
@@ -78,7 +80,7 @@ NetworkSettings:
 L7Settings:
   defaultIngController: 'false'
   noPGForSNI: false # Switching this knob to true, will get rid of poolgroups from SNI VSes. Do not use this flag, if you don't want http caching. This will be deprecated once the controller support caching on PGs.
-  serviceType: NodePortLocal # enum NodePort|ClusterIP|NodePortLocal
+  serviceType: NodePort # enum NodePort|ClusterIP|NodePortLocal
   shardVSSize: SMALL   # Use this to control the layer 7 VS numbers. This applies to both secure/insecure VSes but does not apply for passthrough. ENUMs: LARGE, MEDIUM, SMALL, DEDICATED
   passthroughShardSize: SMALL   # Control the passthrough virtualservice numbers using this ENUM. ENUMs: LARGE, MEDIUM, SMALL
   enableMCI: 'false' # Enabling this flag would tell AKO to start processing multi-cluster ingress objects.
@@ -95,7 +97,7 @@ ControllerSettings:
   controllerVersion: '31.1.2' # The controller API version
   cloudName: sfo-w01-nsx01   # The configured cloud name on the Avi controller.
   controllerHost: '10.11.10.151' # IP address or Hostname of Avi Controller
-  tenantName: b3cf7140-ee60-4c57-afb5-e8941db4d252 # Name of the tenant where all the AKO objects will be created in AVI.
+  tenantName: 'b3cf7140-ee60-4c57-afb5-e8941db4d252' # Name of the tenant where all the AKO objects will be created in AVI.
   vrfName: "" # Name of the VRFContext. All Avi objects will be under this VRF. Applicable only in Vcenter Cloud.
 
 nodePortSelector: # Only applicable if serviceType is NodePort
@@ -128,6 +130,7 @@ persistentVolumeClaim: ''
 mountPath: /log
 logFile: avi.log
 
+
 # values for dependency chart ako-crd-operator
 ako-crd-operator:
  # enabled by default
@@ -136,7 +139,7 @@ ako-crd-operator:
   controllerManager:
     container:
       image:
-        repository: projects.packages.broadcom.com/ako/ako-crd-operator        
+        repository: projects.packages.broadcom.com/ako/ako-crd-operator
         imagePullPolicy: IfNotPresent
         pullSecrets: []
       resources:

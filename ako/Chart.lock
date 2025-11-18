@@ -1,0 +1,6 @@
+dependencies:
+- name: ako-crd-operator
+  repository: oci://projects.packages.broadcom.com/ako/helm-charts
+  version: 2.1.1
+digest: sha256:d25d331cec3be6ef6bd3f72e729fa689114c457ecd797f80c7ea5926b6d8a377
+generated: "2025-11-06T16:55:51.608383857Z"

@@ -1,0 +1,22 @@
+Install OpenShift  service mesh 3.0 operator.
+
+oc create ns istio-system
+oc create ns istio-cni
+
+
+Install istioCNI  (via operator)
+Install istio (via operator)
+
+To enable stric mtls mode:
+
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: demo
+spec:
+  mtls:
+    mode: STRICT
+
+kubectl label namespace avi-system istio.io/rev=default
+kubectl label namespace demo istio.io/rev=default

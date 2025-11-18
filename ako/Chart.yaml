@@ -1,0 +1,11 @@
+apiVersion: v2
+appVersion: 2.1.1
+dependencies:
+- condition: ako-crd-operator.enabled
+  name: ako-crd-operator
+  repository: oci://projects.packages.broadcom.com/ako/helm-charts
+  version: 2.1.1
+description: A helm chart for Avi Kubernetes Operator
+name: ako
+type: application
+version: 2.1.1

@@ -1,0 +1,33 @@
+apiVersion: addons.kubernetes.vmware.com/v1alpha1
+kind: AddonRepository
+metadata:
+  name: example-addonrepository
+  namespace: vmware-system-vks-public
+  annotations:
+    addons.kubernetes.vmware.com/package-offerings: |
+      {
+        "repositoryVersion": "2.1.1",
+        "packages": {
+          "ako.kubernetes.vmware.com": {
+            "versions": ["1.13.4+vmware.1-vks.1", "2.1.1+vmware.1-vks.1"]
+          }
+        }
+      }
+spec:
+  targetRepositoryName: standard-packages
+  fetch:
+    imgpkgBundle:
+      imageURL: vsphere-docker-dev-local.packages.vcfd.broadcom.net/vks-standard-packages/bora-25026956/packages/vks-standard-packages:3.5.0-20251218
+  version: 2.1.1
+---
+apiVersion: addons.kubernetes.vmware.com/v1alpha1
+kind: AddonRepositoryInstall
+metadata:
+  name: default-addon-repo-install
+  namespace: vmware-system-vks-public
+  annotations:
+    addons.kubernetes.vmware.com/skip-vks-managed-addon-repository-update: ""
+spec:
+  addonRepositoryRef:
+    name: example-addonrepository
+    namespace: vmware-system-vks-public

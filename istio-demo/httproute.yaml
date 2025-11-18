@@ -1,0 +1,64 @@
+apiVersion: ako.vmware.com/v1alpha1
+kind: HealthMonitor
+metadata:
+  name: my-health-monitor
+  namespace: demo
+spec:
+  type: HEALTH_MONITOR_HTTP
+  send_interval: 10
+  receive_timeout: 4
+  successful_checks: 2
+  failed_checks: 2
+  monitor_port: 80
+  is_federated: false
+  http_monitor:
+    http_request: "GET / HTTP/1.1"
+    http_response_code:
+      - HTTP_2XX
+    http_response: "OK"
+    exact_http_request: false
+    maintenance_code:
+      - 503
+    maintenance_response: "Maintenance"
+    response_size: 2048
+---
+apiVersion: ako.vmware.com/v1alpha2
+kind: L7Rule
+metadata:
+  name: gw-sec
+  namespace: demo
+spec:
+  wafPolicy:
+    kind: AviRef
+    name: System-WAF-Policy
+
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: demo-httproute
+spec:
+  hostnames:
+  - "httproute.k8s.sfo.rainpole.io"
+  parentRefs:
+  - name: chris-tkg-gateway
+  rules:
+  - filters:
+     - type: ExtensionRef
+       extensionRef:
+         group: ako.vmware.com
+         kind: L7Rule
+         name: gw-sec
+    matches:
+    - path:
+        type: Exact
+        value: /
+    backendRefs:
+    - name: web-front-1
+      port: 80
+      filters:
+        - type: ExtensionRef
+          extensionRef:
+            group: ako.vmware.com
+            kind: HealthMonitor
+            name: System-Ping

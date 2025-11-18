@@ -1,0 +1,32 @@
+apiVersion: vmoperator.vmware.com/v1alpha4
+kind: VirtualMachineService
+metadata:
+  name: chris-clusterip
+spec:
+  selector:
+    vm-lb-hhln: vm-lb-selector 
+  type: ClusterIP
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress
+spec:
+  ingressClassName: avi-lb
+  rules:
+    - host: ingress6.k8s.sfo.rainpole.io
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: chris-clusterip
+                port:
+                  number: 80
